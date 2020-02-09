@@ -1,0 +1,22 @@
+PODS:
+  - Flutter (1.0.0)
+  - YTK_DIO (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - YTK_DIO (from `.symlinks/plugins/YTK_DIO/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  YTK_DIO:
+    :path: ".symlinks/plugins/YTK_DIO/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  YTK_DIO: 87a60c884f7524b6db87c95047fdcda0f23f99d7
+
+PODFILE CHECKSUM: 083258d7f5e80b42ea9bfee905fe93049bc04c64
+
+COCOAPODS: 1.8.4
