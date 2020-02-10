@@ -26,6 +26,12 @@ MCBaseRequest 的基本的思想是把每一个网络请求封装成对象。所
 假如我们要向网址 `https://xrurl.cn/user/login` 发送一个 `GET` 请求，，这个类应该如下所示：
 ```
 class LoginRequest extends MCBaseRequest {
+  LoginRequest({String username, String password}) {
+    _username = username;
+    _password = password;
+  }
+  String _username;
+  String _password;
   @override
   String requestUrl() {
     return "user/login";
@@ -39,6 +45,12 @@ class LoginRequest extends MCBaseRequest {
   @override
   bool isLog() {
     return false;
+  }
+
+  @override
+  Map<String, String> requestArgument() {
+    // TODO: implement requestArgument
+    return {"username": _username, "password": _password};
   }
 }
 ```

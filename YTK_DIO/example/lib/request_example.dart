@@ -1,6 +1,12 @@
 import 'package:YTK_DIO/MC_YTK_DIO.dart';
 
 class LoginRequest extends MCBaseRequest {
+  LoginRequest({String username, String password}) {
+    _username = username;
+    _password = password;
+  }
+  String _username;
+  String _password;
   @override
   String requestUrl() {
     return "user/login";
@@ -14,6 +20,12 @@ class LoginRequest extends MCBaseRequest {
   @override
   bool isLog() {
     return false;
+  }
+
+  @override
+  Map<String, String> requestArgument() {
+    // TODO: implement requestArgument
+    return {"username": _username, "password": _password};
   }
 }
 
