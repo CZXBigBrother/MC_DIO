@@ -22,6 +22,13 @@ abstract class MCRequestAccessory {
   // void requestError();
 }
 
+class MCRequestData {
+  MCRequestData({this.requestObject, this.response, this.error});
+  MCBaseRequest requestObject;
+  Response response;
+  dynamic error;
+}
+
 class CustomInterceptors extends InterceptorsWrapper {
   List<MCRequestAccessory> accessory;
   CustomInterceptors({this.accessory});
@@ -69,7 +76,6 @@ class MCBaseRequest {
   }
 
   CancelToken token = CancelToken();
-  MCBaseRequest() {}
 
   void startWithCompletionBlockWithSuccess(
       Function success, Function failure) async {
@@ -109,21 +115,23 @@ class MCBaseRequest {
       }
     } catch (e) {
       if (failure != null) {
-        failure(res);
+        failure(MCRequestData(requestObject: this, error: failure));
       }
     }
 
     if (res.statusCode == 200) {
       if (success != null) {
-        success(res);
+        success(MCRequestData(requestObject: this, response: res));
       }
     } else {
       if (failure != null) {
-        failure(res);
+        // failure(res);
+        failure(MCRequestData(requestObject: this, error: failure));
       }
     }
   }
 
+  void clearCompletionBlock() {}
   void stop() {
     token.cancel("cancelled");
   }
@@ -195,4 +203,5 @@ class MCBaseRequest {
   ResponseType responseType() {
     return ResponseType.plain;
   }
+  
 }
