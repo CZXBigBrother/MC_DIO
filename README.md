@@ -1,5 +1,5 @@
 # MC_DIO
-简书地址:[https://www.jianshu.com/u/82ce13e5e1fc](https://www.jianshu.com/u/82ce13e5e1fc)
+简书地址:https://www.jianshu.com/u/82ce13e5e1fc
  根据YTK的封装思路封装了dio的网络请求框架
  还在开发测试中,请勿使用在实际项目
 
@@ -54,6 +54,11 @@ class LoginRequest extends MCBaseRequest {
   }
 }
 ```
+在上面这个示例中，我们可以看到：
+
+我们通过覆盖 MCBaseRequest 类的 requestUrl 方法，实现了指定网址信息。并且我们只需要指定除去域名剩余的网址信息，因为域名信息在 MCNetworkConfig 中已经设置过了。
+我们通过覆盖 MCBaseRequest 类的 requestMethod 方法，实现了指定 GET 方法来传递参数。
+我们通过覆盖 MCBaseRequest 类的 requestArgument 方法，提供了 GET 的信息。这里面的参数 username 和 password 
 ## 调用 LoginRequest
 ```
 LoginRequest request = LoginRequest();
@@ -67,7 +72,63 @@ LoginRequest request = LoginRequest();
       // print(error);
     });
 ```
+
 ### 3.MCBatchRequest 批量发送
-填写中....
+MCBatchRequest 类：用于方便地发送批量的网络请求，MCBatchRequest 是一个容器类，它可以放置多个 MCBaseRequest 子类，并统一处理这多个网络请求的成功和失败。
+在如下的示例中，我们发送了 8 个批量的请求，并统一处理这 8 个请求同时成功的回调。
+```
+  void loadNetwork() async {
+    LoginRequest request1 = LoginRequest();
+    LoginRequest request2 = LoginRequest();
+    LoginRequest request3 = LoginRequest();
+    LoginRequest request4 = LoginRequest();
+    LoginRequest request5 = LoginRequest();
+    LoginRequest request6 = LoginRequest();
+    LoginRequest request7 = LoginRequest();
+    LoginRequest request8 = LoginRequest();
+
+    MCBatchRequest batchRequest = MCBatchRequest([
+      request1,
+      request2,
+      request3,
+      request4,
+      request5,
+      request6,
+      request7,
+      request8
+    ]);
+    batchRequest.startWithCompletionBlockWithSuccess((success, failure) {
+     //成功的请求队列
+      print(success);
+      //失败的请求队列
+      print(failure);
+    });
+  }
+```
 ### 4.MCRequestAccessory 请求附件
-填写中....
+继承实现
+```
+class RequestHUDAccessory implements MCRequestAccessory {
+  @override
+  void requestDidStop() {
+    //请求结束
+    print("RequestHUDAccessory requestDidStop");
+  }
+
+  @override
+  void requestWillStart() {
+  //请求开始
+    print("RequestHUDAccessory requestWillStart");
+  }
+}
+```
+使用方法
+```
+    LoginRequest request = LoginRequest();
+    RequestHUDAccessory hudAccessory = RequestHUDAccessory();
+    直接添加进请求对象队列
+    request.addAccessory(hudAccessory);
+```
+#### 使用场景
+1.hud生命周期管理统一通过RequestHUDAccessory实现
+2.成功失败特殊任务实现

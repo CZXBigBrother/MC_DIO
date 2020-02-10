@@ -40,8 +40,10 @@ class TestTestControllerState extends State<TestTestController> {
       request8
     ]);
     batchRequest.startWithCompletionBlockWithSuccess((success, failure) {
+      //成功的请求队列
       print(success);
       print("------");
+      //失败的请求队列
       print(failure);
     });
     // Dio dio = Dio();
