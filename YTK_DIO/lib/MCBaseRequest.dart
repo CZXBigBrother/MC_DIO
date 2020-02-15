@@ -1,11 +1,10 @@
-import 'dart:async';
-import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
+import 'MCRequestData.dart';
 import 'MCConfig.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:cookie_jar/cookie_jar.dart';
 
+///所有支持的请求
 enum MCRequestMethod {
   MCRequestMethodGet,
   MCRequestMethodPost,
@@ -16,17 +15,11 @@ enum MCRequestMethod {
   MCRequestMethodDownload,
 }
 
+/// Accessory实现协议
 abstract class MCRequestAccessory {
   void requestWillStart();
   void requestDidStop();
   // void requestError();
-}
-
-class MCRequestData {
-  MCRequestData({this.requestObject, this.response, this.error});
-  MCBaseRequest requestObject;
-  Response response;
-  dynamic error;
 }
 
 class CustomInterceptors extends InterceptorsWrapper {
@@ -34,7 +27,6 @@ class CustomInterceptors extends InterceptorsWrapper {
   CustomInterceptors({this.accessory});
   @override
   Future onRequest(RequestOptions options) {
-    print("onRequest");
     if (accessory != null || accessory.length > 0) {
       for (MCRequestAccessory item in accessory) {
         item.requestWillStart();
@@ -45,7 +37,6 @@ class CustomInterceptors extends InterceptorsWrapper {
 
   @override
   Future onResponse(Response response) {
-    print("onResponse");
     if (accessory != null || accessory.length > 0) {
       for (MCRequestAccessory item in accessory) {
         item.requestDidStop();
@@ -56,7 +47,6 @@ class CustomInterceptors extends InterceptorsWrapper {
 
   @override
   Future onError(DioError err) {
-    print("onError");
     if (accessory != null || accessory.length > 0) {
       for (MCRequestAccessory item in accessory) {
         item.requestDidStop();
@@ -66,19 +56,33 @@ class CustomInterceptors extends InterceptorsWrapper {
   }
 }
 
+typedef MCRequestCallback = void Function(MCRequestData data);
+
 class MCBaseRequest {
   Dio dio = new Dio();
-  Function success;
-  Function failure;
+
+  ///成功回调
+  MCRequestCallback success;
+
+  ///失败回调
+  MCRequestCallback failure;
+
+  ///接收进度
+  ProgressCallback onReceiveProgress;
+
+  ///发送进度
+  ProgressCallback onSendProgress;
+
+  ///取消token
+  CancelToken _token = CancelToken();
+
   List<MCRequestAccessory> _requestAccessories = List();
   void addAccessory(MCRequestAccessory accessory) {
     _requestAccessories.add(accessory);
   }
 
-  CancelToken token = CancelToken();
-
   void startWithCompletionBlockWithSuccess(
-      Function success, Function failure) async {
+      MCRequestCallback success, MCRequestCallback failure) async {
     this.success = success;
     this.failure = failure;
     dio.options.connectTimeout = this.connectTimeout();
@@ -92,26 +96,52 @@ class MCBaseRequest {
     if (this.isLog() == true) {
       dio.interceptors.add(LogInterceptor(responseBody: false)); //开启请求日志
     }
-    String path = "${this.baseUrl()}${this.requestUrl()}";
+    String path = "";
+    if (this.requestUrl().startsWith("http") ||
+        this.requestUrl().startsWith("ftp")) {
+      path = this.requestUrl();
+    } else {
+      path = "${this.baseUrl()}${this.requestUrl()}";
+    }
     Map param = this.requestArgument();
     Response res;
     try {
       if (this.requestMethod() == MCRequestMethod.MCRequestMethodGet) {
-        res = await dio.get(path, queryParameters: param);
+        res = await dio.get(path,
+            queryParameters: param,
+            cancelToken: this._token,
+            onReceiveProgress: this.onReceiveProgress);
       } else if (this.requestMethod() == MCRequestMethod.MCRequestMethodPost) {
-        res = await dio.post(path, queryParameters: param);
+        res = await dio.post(path,
+            queryParameters: param,
+            cancelToken: this._token,
+            onSendProgress: this.onSendProgress,
+            onReceiveProgress: this.onReceiveProgress);
       } else if (this.requestMethod() == MCRequestMethod.MCRequestMethodHead) {
-        res = await dio.head(path, queryParameters: param);
+        res = await dio.head(path,
+            queryParameters: param, cancelToken: this._token);
       } else if (this.requestMethod() == MCRequestMethod.MCRequestMethodPut) {
-        res = await dio.put(path, queryParameters: param);
+        res = await dio.put(path,
+            queryParameters: param,
+            cancelToken: this._token,
+            onSendProgress: this.onSendProgress,
+            onReceiveProgress: this.onReceiveProgress);
       } else if (this.requestMethod() ==
           MCRequestMethod.MCRequestMethodDelete) {
-        res = await dio.delete(path, queryParameters: param);
+        res = await dio.delete(path,
+            queryParameters: param, cancelToken: this._token);
       } else if (this.requestMethod() == MCRequestMethod.MCRequestMethodPatch) {
-        res = await dio.patch(path, queryParameters: param);
+        res = await dio.patch(path,
+            queryParameters: param,
+            cancelToken: this._token,
+            onSendProgress: this.onSendProgress,
+            onReceiveProgress: this.onReceiveProgress);
       } else if (this.requestMethod() ==
           MCRequestMethod.MCRequestMethodDownload) {
-        res = await dio.download(path, this.savePath(), queryParameters: param);
+        res = await dio.download(path, this.savePath(),
+            queryParameters: param,
+            cancelToken: this._token,
+            onReceiveProgress: this.onReceiveProgress);
       }
     } catch (e) {
       if (failure != null) {
@@ -132,55 +162,58 @@ class MCBaseRequest {
   }
 
   void clearCompletionBlock() {}
+
+  ///停止请求
   void stop() {
-    token.cancel("cancelled");
+    _token.cancel("cancelled");
   }
 
-  // header 返回
+  /// header 返回
   Map<String, String> setHeader() {
     return null;
   }
 
-  // 请求参数
-  Map<String, String> requestArgument() {
+  /// 请求参数
+  dynamic requestArgument() {
     return null;
   }
 
-  // 请求URL
+  /// 请求URL
   String requestUrl() {
     return null;
   }
 
-  // 请求base host
+  /// 请求base host
   String baseUrl() {
     return MCNetworkConfig().baseUrl;
   }
 
-  // 请求类型
+  /// 请求类型
   MCRequestMethod requestMethod() {
     return MCRequestMethod.MCRequestMethodGet;
   }
 
-  // 链接超时时间
+  /// 链接超时时间
   int connectTimeout() {
     return 60000;
   }
 
-  // 发送超时时间
+  /// 发送超时时间
   int sendTimeout() {
     return 60000;
   }
 
-  // 接受超时时间
+  /// 接受超时时间
   int receiveTimeout() {
     return 60000;
   }
 
-  //下载地址
+  ///下载地址
   String savePath() {
     return "";
   }
 
+  ///是否打印调试信息
   bool isLog() {
     return MCNetworkConfig().isLog;
   }
@@ -203,5 +236,17 @@ class MCBaseRequest {
   ResponseType responseType() {
     return ResponseType.plain;
   }
-  
+
+  /// cookie管理
+  /// 内存缓存
+  /// return CookieManager(CookieJar());
+  /// 本地缓存
+  /// return CookieManager(PersistCookieJar());
+  /// 缓存
+  /// Directory appDocDir = await getApplicationDocumentsDirectory();
+  /// String appDocPath = appDocDir.path;
+  /// var cookieJar=PersistCookieJar(dir:appdocPath+"/.cookies/");
+  CookieManager cookieJar() {
+    return null;
+  }
 }

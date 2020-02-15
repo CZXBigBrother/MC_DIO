@@ -39,7 +39,10 @@ class TestTestControllerState extends State<TestTestController> {
       request7,
       request8
     ]);
-    batchRequest.startWithCompletionBlockWithSuccess((success, failure) {
+    RequestHUDAccessory hudAccessory = RequestHUDAccessory();
+    batchRequest.addAccessory(hudAccessory);
+    batchRequest.startWithCompletionBlockWithSuccess(
+        (List<MCRequestData> success, List<MCRequestData> failure) {
       //成功的请求队列
       print(success);
       print("------");

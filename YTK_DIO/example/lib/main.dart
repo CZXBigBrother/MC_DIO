@@ -22,8 +22,12 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     MCNetworkConfig().baseUrl = 'https://xrurl.cn/';
     MCNetworkConfig().isLog = true;
-    LoginRequest request = LoginRequest();
+    LoginRequest request =
+        LoginRequest(username: "username", password: "password");
     RequestHUDAccessory hudAccessory = RequestHUDAccessory();
+    request.onReceiveProgress = (int send, int total) {
+      print("send ${send},total ${total}");
+    };
     request.addAccessory(hudAccessory);
     request.startWithCompletionBlockWithSuccess((MCRequestData data) {
       print(data.requestObject);
