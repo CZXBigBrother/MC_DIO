@@ -1,5 +1,6 @@
 import 'MCRequestData.dart';
 import 'MCBaseRequest.dart';
+import 'MCRequestAccessory.dart';
 
 class MCBatchRequest {
   MCBatchRequest(List<MCBaseRequest> requestArray) {

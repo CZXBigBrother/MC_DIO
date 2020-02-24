@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
 import 'MCRequestData.dart';
 import 'MCConfig.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'MCRequestAccessory.dart';
+// import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+// import 'package:cookie_jar/cookie_jar.dart';
 
 ///所有支持的请求
 enum MCRequestMethod {
@@ -12,47 +14,6 @@ enum MCRequestMethod {
   MCRequestMethodDelete,
   MCRequestMethodPatch,
   MCRequestMethodDownload,
-}
-
-/// Accessory实现协议
-abstract class MCRequestAccessory {
-  void requestWillStart();
-  void requestDidStop();
-  // void requestError();
-}
-
-class CustomInterceptors extends InterceptorsWrapper {
-  List<MCRequestAccessory> accessory;
-  CustomInterceptors({this.accessory});
-  @override
-  Future onRequest(RequestOptions options) {
-    if (accessory != null || accessory.length > 0) {
-      for (MCRequestAccessory item in accessory) {
-        item.requestWillStart();
-      }
-    }
-    return super.onRequest(options);
-  }
-
-  @override
-  Future onResponse(Response response) {
-    if (accessory != null || accessory.length > 0) {
-      for (MCRequestAccessory item in accessory) {
-        item.requestDidStop();
-      }
-    }
-    return super.onResponse(response);
-  }
-
-  @override
-  Future onError(DioError err) {
-    if (accessory != null || accessory.length > 0) {
-      for (MCRequestAccessory item in accessory) {
-        item.requestDidStop();
-      }
-    }
-    return super.onError(err);
-  }
 }
 
 typedef MCRequestCallback = void Function(MCRequestData data);
@@ -89,8 +50,10 @@ class MCBaseRequest {
     dio.options.sendTimeout = this.sendTimeout();
     dio.options.contentType = this.contentType();
     dio.options.responseType = this.responseType();
+    this.CustomInterceptorAdd();
     if (_requestAccessories.length > 0) {
-      dio.interceptors.add(CustomInterceptors(accessory: _requestAccessories));
+      dio.interceptors
+          .add(MCRequestAccessoryInterceptors(accessory: _requestAccessories));
     }
     if (this.isLog() == true) {
       dio.interceptors.add(LogInterceptor(responseBody: false)); //开启请求日志
@@ -235,8 +198,13 @@ class MCBaseRequest {
   ResponseType responseType() {
     return ResponseType.plain;
   }
-  
-  ///import 'package:cookie_jar/cookie_jar.dart';
+
+  /// 如果需要自定义添加一些拦截器可以重写该方法
+  /// 如果添加cookie dio.interceptors.add(CookieManager(cookieJar));
+  CustomInterceptorAdd() {}
+
+  /// cookie_jar: ^1.0.1
+  /// import 'package:cookie_jar/cookie_jar.dart';
   /// cookie管理
   /// 内存缓存
   /// return CookieManager(CookieJar());
@@ -246,7 +214,7 @@ class MCBaseRequest {
   /// Directory appDocDir = await getApplicationDocumentsDirectory();
   /// String appDocPath = appDocDir.path;
   /// var cookieJar=PersistCookieJar(dir:appdocPath+"/.cookies/");
-  CookieManager cookieJar() {
-    return null;
-  }
+  // CookieManager cookieJar() {
+  //   return null;
+  // }
 }
