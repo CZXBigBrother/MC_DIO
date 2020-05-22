@@ -6,8 +6,9 @@ import 'request_example.dart';
 void main() async {
   MCNetworkConfig().baseUrl = 'https://xrurl.cn/';
   MCNetworkConfig().isLog = true;
-  sendRequestDemo();
-  sendBatchRequestDemo();
+  // sendRequestDemo();
+  var xxx = TestWidget();
+  xxx.start();
 }
 
 //网络请求 调用 LoginRequest
@@ -66,4 +67,31 @@ void sendBatchRequestDemo() async {
   // for (Response item in response) {
   //   print(item.statusCode);
   // }
+}
+
+class TestWidget implements MCRequestDelegate {
+  @override
+  void requestFailed(MCBaseRequest request) {
+    // TODO: implement requestFailed
+    print("requestFailed");
+  }
+
+  @override
+  void requestFinished(MCBaseRequest request) {
+    // TODO: implement requestFinished
+    print("requestFinished");
+    // print(request.data.response);
+  }
+
+  void start() {
+    LoginRequest request = LoginRequest();
+    request.delegate = this;
+    request.success = (data) {
+      print("success");
+    };
+    request.failure = (data) {
+      print("failure");
+    };
+    request.start();
+  }
 }

@@ -1,6 +1,7 @@
-import 'MCRequestData.dart';
-import 'MCBaseRequest.dart';
-import 'MCRequestAccessory.dart';
+import 'mc_dio.dart';
+
+typedef MCBatchCallback = void Function(
+    List<MCRequestData> successRequest, List<MCRequestData> failureRequest);
 
 class MCBatchRequest {
   MCBatchRequest(List<MCBaseRequest> requestArray) {
@@ -20,7 +21,7 @@ class MCBatchRequest {
     _requestAccessories.add(accessory);
   }
 
-  void startWithCompletionBlockWithSuccess(Function success) async {
+  void startWithCompletionBlockWithSuccess(MCBatchCallback success) async {
     for (MCRequestAccessory item in _requestAccessories) {
       item.requestWillStart();
     }

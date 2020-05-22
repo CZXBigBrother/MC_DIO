@@ -1,5 +1,5 @@
-import 'package:dio/dio.dart';
-import 'MCBaseRequest.dart';
+import 'mc_dio.dart';
+
 class MCRequestData {
   MCRequestData({this.requestObject, this.response, this.error});
   MCBaseRequest requestObject;

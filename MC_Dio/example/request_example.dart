@@ -1,4 +1,4 @@
-import 'package:MC_Dio/MC_Dio.dart';
+import 'package:MC_Dio/mc_dio.dart';
 
 class LoginRequest extends MCBaseRequest {
   LoginRequest({String username, String password}) {
@@ -14,7 +14,7 @@ class LoginRequest extends MCBaseRequest {
 
   @override
   MCRequestMethod requestMethod() {
-    return MCRequestMethod.MCRequestMethodGet;
+    return MCRequestMethod.Get;
   }
 
   @override
