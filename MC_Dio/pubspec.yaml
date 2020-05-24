@@ -1,8 +1,8 @@
 name: MC_Dio
 description: Command of DIO request
 version: 0.1.1
-author:
-homepage:
+author: marco chen
+homepage: https://github.com/CZXBigBrother
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
