@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:MC_Dio/MC_Dio.dart';
+import 'package:mc_dio/MC_Dio.dart';
 
 void main() {
   

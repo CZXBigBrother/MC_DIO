@@ -1,4 +1,4 @@
-import 'package:MC_Dio/mc_dio.dart';
+import 'package:mc_dio/mc_dio.dart';
 
 class LoginRequest extends MCBaseRequest {
   LoginRequest({String username, String password}) {

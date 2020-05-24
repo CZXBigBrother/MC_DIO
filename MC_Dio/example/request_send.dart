@@ -1,4 +1,4 @@
-import 'package:MC_Dio/MC_Dio.dart';
+import 'package:mc_dio/mc_dio.dart';
 import 'dart:async';
 
 import 'request_example.dart';
@@ -6,7 +6,7 @@ import 'request_example.dart';
 void main() async {
   MCNetworkConfig().baseUrl = 'https://xrurl.cn/';
   MCNetworkConfig().isLog = true;
-  // sendRequestDemo();
+  sendRequestDemo();
   var xxx = TestWidget();
   xxx.start();
 }
