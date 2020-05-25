@@ -1,5 +1,4 @@
 import 'package:mc_dio/mc_dio.dart';
-import 'dart:async';
 
 import 'request_example.dart';
 
@@ -72,15 +71,12 @@ void sendBatchRequestDemo() async {
 class TestWidget implements MCRequestDelegate {
   @override
   void requestFailed(MCBaseRequest request) {
-    // TODO: implement requestFailed
     print("requestFailed");
   }
 
   @override
   void requestFinished(MCBaseRequest request) {
-    // TODO: implement requestFinished
     print("requestFinished");
-    // print(request.data.response);
   }
 
   void start() {

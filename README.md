@@ -1,4 +1,7 @@
 # MC_DIO
+[![Pub](https://img.shields.io/pub/v/dio.svg?style=flat-square)](https://pub.dartlang.org/packages/dio)
+
+
 简书地址:https://www.jianshu.com/u/82ce13e5e1fc
  根据YTK的封装思路封装了dio的网络请求框架
  还在开发测试中,请勿使用在实际项目

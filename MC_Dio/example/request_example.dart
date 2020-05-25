@@ -24,7 +24,6 @@ class LoginRequest extends MCBaseRequest {
 
   @override
   Map<String, String> requestArgument() {
-    // TODO: implement requestArgument
     return {"username": _username, "password": _password};
   }
 }

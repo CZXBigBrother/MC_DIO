@@ -62,7 +62,7 @@ class MCBaseRequest {
     dio.options.contentType = this.contentType();
     dio.options.responseType = this.responseType();
     dio.options.headers = this.setHeader();
-    this.CustomInterceptorAdd();
+    this.customInterceptorAdd();
     dio.interceptors.clear();
     if (_requestAccessories.length > 0) {
       dio.interceptors
@@ -233,7 +233,7 @@ class MCBaseRequest {
 
   /// 如果需要自定义添加一些拦截器可以重写该方法
   /// 如果添加cookie dio.interceptors.add(CookieManager(cookieJar));
-  CustomInterceptorAdd() {}
+  customInterceptorAdd() {}
 
   /// cookie_jar: ^1.0.1
   /// import 'package:cookie_jar/cookie_jar.dart';

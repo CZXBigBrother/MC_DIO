@@ -30,7 +30,7 @@ class MCBatchRequest {
         this.successRequest.add(data);
         _currentEnd++;
         if (_currentEnd == this._requestArray.length && _isStop == false) {
-          print("完成请求${_currentEnd}");
+          // print("完成请求${_currentEnd}");
           success(this.successRequest, this.failureRequest);
           for (MCRequestAccessory item in _requestAccessories) {
             item.requestDidStop();
@@ -40,7 +40,7 @@ class MCBatchRequest {
         this.failureRequest.add(error);
         _currentEnd++;
         if (_currentEnd == this._requestArray.length && _isStop == false) {
-          print("完成请求${_currentEnd}");
+          // print("完成请求${_currentEnd}");
           success(this.successRequest, this.failureRequest);
           for (MCRequestAccessory item in _requestAccessories) {
             item.requestDidStop();
