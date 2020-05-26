@@ -1,5 +1,5 @@
 # MC_DIO
-[![Pub](https://img.shields.io/pub/v/dio.svg?style=flat-square)](https://pub.dartlang.org/packages/dio)
+[![Pub](https://img.shields.io/pub/v/dio.svg?style=flat-square)](https://pub.dev/packages/mc_dio)
 
 
 简书地址:https://www.jianshu.com/u/82ce13e5e1fc
