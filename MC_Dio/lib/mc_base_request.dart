@@ -80,6 +80,19 @@ class MCBaseRequest {
     }
     // Map param = this.requestArgument();
     Response res;
+
+    if (this.mock() != null) {
+      this.data = MCRequestData(requestObject: this, response: Response(data: this.mock()));
+      this.requestCompleteFilter();
+      if (success != null) {
+        success(this.data);
+      }
+      if (this.delegate != null) {
+        this.delegate.requestFinished(this);
+      }
+      return;
+    }
+
     try {
       if (this.requestMethod() == MCRequestMethod.Get) {
         res = await dio.get(path,
@@ -229,6 +242,11 @@ class MCBaseRequest {
   /// 如果想以文本(字符串)格式接收响应数据，请使用 `PLAIN`.
   ResponseType responseType() {
     return ResponseType.plain;
+  }
+
+  ///mock数据
+  dynamic mock() {
+    return null;
   }
 
   /// 如果需要自定义添加一些拦截器可以重写该方法

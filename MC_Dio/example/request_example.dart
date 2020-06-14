@@ -26,6 +26,10 @@ class LoginRequest extends MCBaseRequest {
   Map<String, String> requestArgument() {
     return {"username": _username, "password": _password};
   }
+  @override
+  mock() {
+    return {"mock_key":"mock data"};
+  }
 }
 
 class RequestHUDAccessory implements MCRequestAccessory {

@@ -134,3 +134,13 @@ class RequestHUDAccessory implements MCRequestAccessory {
 #### 使用场景
 1.hud生命周期管理统一通过RequestHUDAccessory实现
 2.成功失败特殊任务实现
+
+### 5.mock功能
+重写mock函数
+```
+  @override
+  mock() {
+    return {"mock_key":"mock data"};
+  }
+```
+重写之后data.response返回就为mock内容,且不会发起实际请求

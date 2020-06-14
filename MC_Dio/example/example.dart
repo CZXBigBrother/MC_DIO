@@ -6,8 +6,8 @@ void main() async {
   MCNetworkConfig().baseUrl = 'https://xrurl.cn/';
   MCNetworkConfig().isLog = true;
   sendRequestDemo();
-  var xxx = TestWidget();
-  xxx.start();
+  // var xxx = TestWidget();
+  // xxx.start();
 }
 
 //网络请求 调用 LoginRequest
