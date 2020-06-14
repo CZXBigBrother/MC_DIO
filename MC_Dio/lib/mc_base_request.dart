@@ -81,8 +81,9 @@ class MCBaseRequest {
     // Map param = this.requestArgument();
     Response res;
 
-    if (this.mock() != null) {
-      this.data = MCRequestData(requestObject: this, response: Response(data: this.mock()));
+    dynamic mock = await this.mock();
+    if (mock != null) {
+      this.data = MCRequestData(requestObject: this, response: Response(data: mock));
       this.requestCompleteFilter();
       if (success != null) {
         success(this.data);
@@ -245,7 +246,7 @@ class MCBaseRequest {
   }
 
   ///mock数据
-  dynamic mock() {
+  dynamic mock() async {
     return null;
   }
 
