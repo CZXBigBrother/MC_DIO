@@ -1,7 +1,6 @@
-# MC_DIO
 [![Pub](https://img.shields.io/pub/v/dio.svg?style=flat-square)](https://pub.dev/packages/mc_dio)
 
-
+# MC_DIO
 简书地址:https://www.jianshu.com/u/82ce13e5e1fc
  根据YTK的封装思路封装了dio的网络请求框架
  还在开发测试中,请勿使用在实际项目
@@ -135,3 +134,13 @@ class RequestHUDAccessory implements MCRequestAccessory {
 #### 使用场景
 1.hud生命周期管理统一通过RequestHUDAccessory实现
 2.成功失败特殊任务实现
+
+### 5.mock功能
+重写mock函数
+```
+  @override
+  mock() {
+    return {"mock_key":"mock data"};
+  }
+```
+重写之后data.response返回就为mock内容,且不会发起实际请求
