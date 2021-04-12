@@ -62,8 +62,8 @@ class MCBaseRequest {
     dio.options.contentType = this.contentType();
     dio.options.responseType = this.responseType();
     dio.options.headers = this.setHeader();
-    this.customInterceptorAdd();
     dio.interceptors.clear();
+    this.customInterceptorAdd();
     if (_requestAccessories.length > 0) {
       dio.interceptors
           .add(MCRequestAccessoryInterceptors(accessory: _requestAccessories));
@@ -83,7 +83,8 @@ class MCBaseRequest {
 
     dynamic mock = await this.mock();
     if (mock != null) {
-      this.data = MCRequestData(requestObject: this, response: Response(data: mock));
+      this.data =
+          MCRequestData(requestObject: this, response: Response(data: mock));
       this.requestCompleteFilter();
       if (success != null) {
         success(this.data);
