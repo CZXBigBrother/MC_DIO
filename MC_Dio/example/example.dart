@@ -19,9 +19,7 @@ void sendRequestDemo() {
     print("send ${send},total ${total}");
   };
   request.addAccessory(hudAccessory);
-  request.startWithCompletionBlockWithSuccess((MCRequestData data) {
-    print(data.requestObject);
-    print(data.response);
+  request.startWithCompletionBlockWithSuccess((MCRequestData? data) {
     print("结束");
   }, (error) {
     print(error);
@@ -52,7 +50,7 @@ void sendBatchRequestDemo() async {
   RequestHUDAccessory hudAccessory = RequestHUDAccessory();
   batchRequest.addAccessory(hudAccessory);
   batchRequest.startWithCompletionBlockWithSuccess(
-      (List<MCRequestData> success, List<MCRequestData> failure) {
+      (List<MCRequestData?> success, List<MCRequestData?> failure) {
     //成功的请求队列
     print(success);
     print("------");

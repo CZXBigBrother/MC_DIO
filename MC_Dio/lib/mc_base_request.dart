@@ -1,9 +1,11 @@
 import 'mc_dio.dart';
+
 // import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 // import 'package:cookie_jar/cookie_jar.dart';
 
 abstract class MCRequestDelegate {
   void requestFinished(MCBaseRequest request);
+
   void requestFailed(MCBaseRequest request);
 }
 
@@ -18,31 +20,32 @@ enum MCRequestMethod {
   Download,
 }
 
-typedef MCRequestCallback = void Function(MCRequestData data);
+typedef MCRequestCallback = void Function(MCRequestData? data);
 
 class MCBaseRequest {
-  MCRequestDelegate delegate;
+  MCRequestDelegate? delegate;
 
-  MCRequestData data;
+  MCRequestData? data;
 
   Dio dio = new Dio();
 
   ///成功回调
-  MCRequestCallback success;
+  MCRequestCallback? success;
 
   ///失败回调
-  MCRequestCallback failure;
+  MCRequestCallback? failure;
 
   ///接收进度
-  ProgressCallback onReceiveProgress;
+  ProgressCallback? onReceiveProgress;
 
   ///发送进度
-  ProgressCallback onSendProgress;
+  ProgressCallback? onSendProgress;
 
   ///取消token
   CancelToken _token = CancelToken();
 
-  List<MCRequestAccessory> _requestAccessories = List();
+  List<MCRequestAccessory> _requestAccessories = [];
+
   void addAccessory(MCRequestAccessory accessory) {
     _requestAccessories.add(accessory);
   }
@@ -71,64 +74,66 @@ class MCBaseRequest {
     if (this.isLog() == true) {
       dio.interceptors.add(LogInterceptor(responseBody: false)); //开启请求日志
     }
-    String path = "";
-    if (this.requestUrl().startsWith("http") ||
-        this.requestUrl().startsWith("ftp")) {
+    String? path = "";
+    if (this.requestUrl()!.startsWith("http") ||
+        this.requestUrl()!.startsWith("ftp")) {
       path = this.requestUrl();
     } else {
       path = "${this.baseUrl()}${this.requestUrl()}";
     }
     // Map param = this.requestArgument();
-    Response res;
+    Response? res;
 
     dynamic mock = await this.mock();
     if (mock != null) {
-      this.data =
-          MCRequestData(requestObject: this, response: Response(data: mock));
+      this.data = MCRequestData(
+          requestObject: this,
+          response: Response(
+              data: mock, requestOptions: RequestOptions(path: "mock")));
       this.requestCompleteFilter();
       if (success != null) {
-        success(this.data);
+        success!(this.data);
       }
       if (this.delegate != null) {
-        this.delegate.requestFinished(this);
+        this.delegate!.requestFinished(this);
       }
       return;
     }
 
     try {
       if (this.requestMethod() == MCRequestMethod.Get) {
-        res = await dio.get(path,
+        res = await dio.get(path!,
             queryParameters: this.requestArgument(),
             cancelToken: this._token,
             onReceiveProgress: this.onReceiveProgress);
       } else if (this.requestMethod() == MCRequestMethod.Post) {
         // print(param);
-        res = await dio.post(path,
+        res = await dio.post(path!,
             data: this.requestArgument(),
             // queryParameters: param,
             cancelToken: this._token,
             onSendProgress: this.onSendProgress,
             onReceiveProgress: this.onReceiveProgress);
       } else if (this.requestMethod() == MCRequestMethod.Head) {
-        res = await dio.head(path,
+        res = await dio.head(path!,
             queryParameters: this.requestArgument(), cancelToken: this._token);
       } else if (this.requestMethod() == MCRequestMethod.Put) {
-        res = await dio.put(path,
+        res = await dio.put(path!,
             queryParameters: this.requestArgument(),
             cancelToken: this._token,
             onSendProgress: this.onSendProgress,
             onReceiveProgress: this.onReceiveProgress);
       } else if (this.requestMethod() == MCRequestMethod.Delete) {
-        res = await dio.delete(path,
+        res = await dio.delete(path!,
             queryParameters: this.requestArgument(), cancelToken: this._token);
       } else if (this.requestMethod() == MCRequestMethod.Patch) {
-        res = await dio.patch(path,
+        res = await dio.patch(path!,
             queryParameters: this.requestArgument(),
             cancelToken: this._token,
             onSendProgress: this.onSendProgress,
             onReceiveProgress: this.onReceiveProgress);
       } else if (this.requestMethod() == MCRequestMethod.Download) {
-        res = await dio.download(path, this.savePath(),
+        res = await dio.download(path!, this.savePath(),
             queryParameters: this.requestArgument(),
             cancelToken: this._token,
             onReceiveProgress: this.onReceiveProgress);
@@ -137,29 +142,31 @@ class MCBaseRequest {
       this.data = MCRequestData(requestObject: this, error: e);
       this.requestCompleteFilter();
       if (this.failure != null) {
-        this.failure(this.data);
+        this.failure!(this.data);
       }
       if (this.delegate != null) {
-        this.delegate.requestFailed(this);
+        this.delegate!.requestFailed(this);
       }
     }
     if (res == null) {
-      this.data = MCRequestData(requestObject: this, error: DioError());
+      this.data = MCRequestData(
+          requestObject: this,
+          error: DioError(requestOptions: RequestOptions(path: "res_null")));
       this.requestCompleteFilter();
       if (this.failure != null) {
-        this.failure(this.data);
+        this.failure!(this.data);
       }
       if (this.delegate != null) {
-        this.delegate.requestFailed(this);
+        this.delegate!.requestFailed(this);
       }
     } else {
       this.data = MCRequestData(requestObject: this, response: res);
       this.requestCompleteFilter();
       if (success != null) {
-        success(this.data);
+        success!(this.data);
       }
       if (this.delegate != null) {
-        this.delegate.requestFinished(this);
+        this.delegate!.requestFinished(this);
       }
     }
   }
@@ -188,7 +195,7 @@ class MCBaseRequest {
   }
 
   /// 请求URL
-  String requestUrl() {
+  String? requestUrl() {
     return null;
   }
 
@@ -266,7 +273,7 @@ class MCBaseRequest {
   /// Directory appDocDir = await getApplicationDocumentsDirectory();
   /// String appDocPath = appDocDir.path;
   /// var cookieJar=PersistCookieJar(dir:appdocPath+"/.cookies/");
-  // CookieManager cookieJar() {
-  //   return null;
-  // }
+// CookieManager cookieJar() {
+//   return null;
+// }
 }

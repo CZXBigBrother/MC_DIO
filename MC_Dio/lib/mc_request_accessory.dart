@@ -8,35 +8,35 @@ abstract class MCRequestAccessory {
 }
 
 class MCRequestAccessoryInterceptors extends InterceptorsWrapper {
-  List<MCRequestAccessory> accessory;
+  List<MCRequestAccessory>? accessory;
   MCRequestAccessoryInterceptors({this.accessory});
   @override
-  Future onRequest(RequestOptions options) {
-    if (accessory != null || accessory.length > 0) {
-      for (MCRequestAccessory item in accessory) {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    if (accessory != null || accessory!.length > 0) {
+      for (MCRequestAccessory item in accessory!) {
         item.requestWillStart();
       }
     }
-    return super.onRequest(options);
+    return super.onRequest(options, handler);
   }
 
   @override
-  Future onResponse(Response response) {
-    if (accessory != null || accessory.length > 0) {
-      for (MCRequestAccessory item in accessory) {
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    if (accessory != null || accessory!.length > 0) {
+      for (MCRequestAccessory item in accessory!) {
         item.requestDidStop();
       }
     }
-    return super.onResponse(response);
+    return super.onResponse(response, handler);
   }
 
   @override
-  Future onError(DioError err) {
-    if (accessory != null || accessory.length > 0) {
-      for (MCRequestAccessory item in accessory) {
+  void onError(DioError err, ErrorInterceptorHandler handler) {
+    if (accessory != null || accessory!.length > 0) {
+      for (MCRequestAccessory item in accessory!) {
         item.requestDidStop();
       }
     }
-    return super.onError(err);
+    return super.onError(err, handler);
   }
 }

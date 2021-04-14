@@ -2,8 +2,8 @@ import 'mc_dio.dart';
 
 class MCRequestData {
   MCRequestData({this.requestObject, this.response, this.error});
-  MCBaseRequest requestObject;
-  Response response;
+  MCBaseRequest? requestObject;
+  Response? response;
   dynamic error;
 }
 // Response

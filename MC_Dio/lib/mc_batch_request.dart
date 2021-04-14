@@ -1,20 +1,20 @@
 import 'mc_dio.dart';
 
 typedef MCBatchCallback = void Function(
-    List<MCRequestData> successRequest, List<MCRequestData> failureRequest);
+    List<MCRequestData?> successRequest, List<MCRequestData?> failureRequest);
 
 class MCBatchRequest {
   MCBatchRequest(List<MCBaseRequest> requestArray) {
     this._requestArray = requestArray;
   }
 
-  List<MCBaseRequest> _requestArray;
-  Function success;
-  Function failure;
+  late List<MCBaseRequest> _requestArray;
+  Function? success;
+  Function? failure;
   int _currentEnd = 0;
-  List<MCRequestData> successRequest = [];
-  List<MCRequestData> failureRequest = [];
-  List<MCRequestAccessory> _requestAccessories = List();
+  List<MCRequestData?> successRequest = [];
+  List<MCRequestData?> failureRequest = [];
+  List<MCRequestAccessory> _requestAccessories = [];
   bool _isStop = false;
 
   void addAccessory(MCRequestAccessory accessory) {
@@ -26,7 +26,7 @@ class MCBatchRequest {
       item.requestWillStart();
     }
     for (MCBaseRequest request in this._requestArray) {
-      request.startWithCompletionBlockWithSuccess((MCRequestData data) {
+      request.startWithCompletionBlockWithSuccess((MCRequestData? data) {
         this.successRequest.add(data);
         _currentEnd++;
         if (_currentEnd == this._requestArray.length && _isStop == false) {
@@ -36,7 +36,7 @@ class MCBatchRequest {
             item.requestDidStop();
           }
         }
-      }, (MCRequestData error) {
+      }, (MCRequestData? error) {
         this.failureRequest.add(error);
         _currentEnd++;
         if (_currentEnd == this._requestArray.length && _isStop == false) {
