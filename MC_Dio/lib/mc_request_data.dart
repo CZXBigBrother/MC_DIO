@@ -1,10 +1,11 @@
 import 'mc_dio.dart';
 
 class MCRequestData {
-  MCRequestData({this.requestObject, this.response, this.error});
-  MCBaseRequest? requestObject;
+  MCRequestData({required this.requestObject, this.response, this.error});
+
+  MCBaseRequest requestObject;
   Response? response;
-  dynamic error;
+  DioError? error;
 }
 // Response
 // {

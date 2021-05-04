@@ -1,7 +1,5 @@
 import 'mc_dio.dart';
 
-// import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-// import 'package:cookie_jar/cookie_jar.dart';
 
 abstract class MCRequestDelegate {
   void requestFinished(MCBaseRequest request);
@@ -20,14 +18,16 @@ enum MCRequestMethod {
   Download,
 }
 
-typedef MCRequestCallback = void Function(MCRequestData? data);
+typedef MCRequestCallback = void Function(MCRequestData data);
 
 class MCBaseRequest {
   MCRequestDelegate? delegate;
 
-  MCRequestData? data;
+  late MCRequestData data;
 
   Dio dio = new Dio();
+
+//  MCBaseRequest() {}
 
   ///成功回调
   MCRequestCallback? success;
@@ -72,7 +72,9 @@ class MCBaseRequest {
           .add(MCRequestAccessoryInterceptors(accessory: _requestAccessories));
     }
     if (this.isLog() == true) {
-      dio.interceptors.add(LogInterceptor(responseBody: false)); //开启请求日志
+      dio.interceptors
+          .add(LogInterceptor(responseBody: true, requestBody: true)); //开启请求日志
+
     }
     String? path = "";
     if (this.requestUrl()!.startsWith("http") ||
@@ -107,10 +109,8 @@ class MCBaseRequest {
             cancelToken: this._token,
             onReceiveProgress: this.onReceiveProgress);
       } else if (this.requestMethod() == MCRequestMethod.Post) {
-        // print(param);
         res = await dio.post(path!,
             data: this.requestArgument(),
-            // queryParameters: param,
             cancelToken: this._token,
             onSendProgress: this.onSendProgress,
             onReceiveProgress: this.onReceiveProgress);
@@ -147,6 +147,7 @@ class MCBaseRequest {
       if (this.delegate != null) {
         this.delegate!.requestFailed(this);
       }
+      return;
     }
     if (res == null) {
       this.data = MCRequestData(
@@ -159,6 +160,7 @@ class MCBaseRequest {
       if (this.delegate != null) {
         this.delegate!.requestFailed(this);
       }
+      return;
     } else {
       this.data = MCRequestData(requestObject: this, response: res);
       this.requestCompleteFilter();
@@ -168,6 +170,7 @@ class MCBaseRequest {
       if (this.delegate != null) {
         this.delegate!.requestFinished(this);
       }
+      return;
     }
   }
 

@@ -19,8 +19,9 @@ void sendRequestDemo() {
     print("send ${send},total ${total}");
   };
   request.addAccessory(hudAccessory);
-  request.startWithCompletionBlockWithSuccess((MCRequestData? data) {
+  request.startWithCompletionBlockWithSuccess((MCRequestData data) {
     print("结束");
+    print(data.response);
   }, (error) {
     print(error);
   });

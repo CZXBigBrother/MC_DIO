@@ -3,13 +3,16 @@ import 'package:dio/dio.dart';
 /// Accessory实现协议
 abstract class MCRequestAccessory {
   void requestWillStart();
+
   void requestDidStop();
-  // void requestError();
+// void requestError();
 }
 
 class MCRequestAccessoryInterceptors extends InterceptorsWrapper {
   List<MCRequestAccessory>? accessory;
+
   MCRequestAccessoryInterceptors({this.accessory});
+
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     if (accessory != null || accessory!.length > 0) {

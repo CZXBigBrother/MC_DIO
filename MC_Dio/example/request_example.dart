@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:mc_dio/mc_dio.dart';
 
 class LoginRequest extends MCBaseRequest {
@@ -11,12 +13,12 @@ class LoginRequest extends MCBaseRequest {
 
   @override
   String requestUrl() {
-    return "https://github.com/flutterchina/dio/blob/master/README-ZH.md#%E6%8B%A6%E6%88%AA%E5%99%A8";
+    return "http://any.clubchopp.com/any-starr/api/campaign/find_all_campaigns";
   }
 
   @override
   MCRequestMethod requestMethod() {
-    return MCRequestMethod.Get;
+    return MCRequestMethod.Post;
   }
 
   @override
@@ -25,8 +27,9 @@ class LoginRequest extends MCBaseRequest {
   }
 
   @override
-  Map<String, String> requestArgument() {
-    return {"username": _username ?? "", "password": _password ?? ""};
+  requestArgument() {
+    FormData data = FormData.fromMap({"campaignJson":json.encode({"start_row": 0, "page_size": 10,"language":"English"})});
+    return data;
   }
 // @override
 // mock() {
