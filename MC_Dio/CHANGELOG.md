@@ -1,3 +1,7 @@
+## [0.3.1] - 2021.4.14
+fix bug
+support dio 4.0.0
+
 ## [0.3.0] - 2021.4.14
 support null-safety
 
