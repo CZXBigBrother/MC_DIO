@@ -50,15 +50,15 @@ class MCBaseRequest {
     _requestAccessories.add(accessory);
   }
 
-  void startWithCompletionBlockWithSuccess(
-      MCRequestCallback success, MCRequestCallback failure) async {
+  void startWithCompletionBlockWithSuccess(MCRequestCallback success,
+      MCRequestCallback failure) async {
     this.success = success;
     this.failure = failure;
     this.start();
     // this.clearCompletionBlock();
   }
 
-  void start() async {
+  Future? start() async {
     dio.options.connectTimeout = this.connectTimeout();
     dio.options.receiveTimeout = this.receiveTimeout();
     dio.options.sendTimeout = this.sendTimeout();
@@ -73,7 +73,7 @@ class MCBaseRequest {
     }
     if (this.isLog() == true) {
       dio.interceptors
-          .add(LogInterceptor(responseBody: true, requestBody: true)); //开启请求日志
+          .add(LogInterceptor(responseBody: true, requestBody: true,)); //开启请求日志
 
     }
     String? path = "";
@@ -265,17 +265,17 @@ class MCBaseRequest {
   /// 如果添加cookie dio.interceptors.add(CookieManager(cookieJar));
   customInterceptorAdd() {}
 
-  /// cookie_jar: ^1.0.1
-  /// import 'package:cookie_jar/cookie_jar.dart';
-  /// cookie管理
-  /// 内存缓存
-  /// return CookieManager(CookieJar());
-  /// 本地缓存
-  /// return CookieManager(PersistCookieJar());
-  /// 缓存
-  /// Directory appDocDir = await getApplicationDocumentsDirectory();
-  /// String appDocPath = appDocDir.path;
-  /// var cookieJar=PersistCookieJar(dir:appdocPath+"/.cookies/");
+/// cookie_jar: ^1.0.1
+/// import 'package:cookie_jar/cookie_jar.dart';
+/// cookie管理
+/// 内存缓存
+/// return CookieManager(CookieJar());
+/// 本地缓存
+/// return CookieManager(PersistCookieJar());
+/// 缓存
+/// Directory appDocDir = await getApplicationDocumentsDirectory();
+/// String appDocPath = appDocDir.path;
+/// var cookieJar=PersistCookieJar(dir:appdocPath+"/.cookies/");
 // CookieManager cookieJar() {
 //   return null;
 // }

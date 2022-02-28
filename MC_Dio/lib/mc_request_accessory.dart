@@ -2,9 +2,15 @@ import 'package:dio/dio.dart';
 
 /// Accessory实现协议
 abstract class MCRequestAccessory {
-  void requestWillStart();
+  void requestWillStart(
+      {RequestOptions? options, RequestInterceptorHandler? handler});
 
-  void requestDidStop();
+  void requestDidStop(
+      {Response? response,
+      ResponseInterceptorHandler? handler,
+      DioError? err,
+      ErrorInterceptorHandler? handlerErr});
+
 // void requestError();
 }
 
@@ -15,9 +21,9 @@ class MCRequestAccessoryInterceptors extends InterceptorsWrapper {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    if (accessory != null || accessory!.length > 0) {
+    if (accessory != null) {
       for (MCRequestAccessory item in accessory!) {
-        item.requestWillStart();
+        item.requestWillStart(options: options, handler: handler);
       }
     }
     return super.onRequest(options, handler);
@@ -25,9 +31,9 @@ class MCRequestAccessoryInterceptors extends InterceptorsWrapper {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    if (accessory != null || accessory!.length > 0) {
+    if (accessory != null) {
       for (MCRequestAccessory item in accessory!) {
-        item.requestDidStop();
+        item.requestDidStop(response: response, handler: handler);
       }
     }
     return super.onResponse(response, handler);
@@ -35,9 +41,9 @@ class MCRequestAccessoryInterceptors extends InterceptorsWrapper {
 
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) {
-    if (accessory != null || accessory!.length > 0) {
+    if (accessory != null) {
       for (MCRequestAccessory item in accessory!) {
-        item.requestDidStop();
+        item.requestDidStop(err: err, handlerErr: handler);
       }
     }
     return super.onError(err, handler);

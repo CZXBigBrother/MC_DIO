@@ -28,7 +28,10 @@ class LoginRequest extends MCBaseRequest {
 
   @override
   requestArgument() {
-    FormData data = FormData.fromMap({"campaignJson":json.encode({"start_row": 0, "page_size": 10,"language":"English"})});
+    FormData data = FormData.fromMap({
+      "campaignJson":
+          json.encode({"start_row": 0, "page_size": 10, "language": "English"})
+    });
     return data;
   }
 // @override
@@ -39,12 +42,17 @@ class LoginRequest extends MCBaseRequest {
 
 class RequestHUDAccessory implements MCRequestAccessory {
   @override
-  void requestDidStop() {
+  void requestDidStop(
+      {Response? response,
+      ResponseInterceptorHandler? handler,
+      DioError? err,
+      ErrorInterceptorHandler? handlerErr}) {
     print("RequestHUDAccessory requestDidStop");
   }
 
   @override
-  void requestWillStart() {
+  void requestWillStart(
+      {RequestOptions? options, RequestInterceptorHandler? handler}) {
     print("RequestHUDAccessory requestWillStart");
   }
 }
