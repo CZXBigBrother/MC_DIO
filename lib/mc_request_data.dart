@@ -1,12 +1,14 @@
 import 'mc_dio.dart';
 
-class MCRequestData {
+class MCRequestData<T> {
   MCRequestData({required this.requestObject, this.response, this.error});
 
-  MCBaseRequest requestObject;
+  T requestObject;
   Response? response;
   DioError? error;
 }
+
+
 // Response
 // {
 //   /// 响应数据，可能已经被转换了类型, 详情请参考Options中的[ResponseType].

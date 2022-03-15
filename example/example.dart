@@ -5,9 +5,9 @@ import 'request_example.dart';
 void main() async {
   MCNetworkConfig().baseUrl = 'https://xrurl.cn/';
   MCNetworkConfig().isLog = true;
-  sendRequestDemo();
-  // var xxx = TestWidget();
-  // xxx.start();
+  // sendRequestDemo();
+  var xxx = TestWidget();
+  xxx.start();
 }
 
 //网络请求 调用 LoginRequest
@@ -20,14 +20,16 @@ void sendRequestDemo() {
   };
   request.addAccessory(hudAccessory);
   request.startWithCompletionBlockWithSuccess((MCRequestData data) {
-    print("结束");
+    LoginRequest request2 = data.requestObject;
+    print(request2);
     print(data.response);
   }, (error) {
-    print(error);
+    print(error.error!.message);
+    // print(error.error!.response);
   });
 }
 
-//批量发送请求
+///批量发送请求
 void sendBatchRequestDemo() async {
   LoginRequest request1 = LoginRequest();
   LoginRequest request2 = LoginRequest();
@@ -67,26 +69,23 @@ void sendBatchRequestDemo() async {
   // }
 }
 
+/// 代理模式
 class TestWidget implements MCRequestDelegate {
   @override
-  void requestFailed(MCBaseRequest request) {
-    print("requestFailed");
+  void requestFailed(request) {
+    print("代理回调requestFailed");
   }
 
   @override
-  void requestFinished(MCBaseRequest request) {
-    print("requestFinished");
+  void requestFinished(request) {
+    LoginRequest request2 = request;
+    print(request2.response!.data);
+    print("代理回调requestFinished");
   }
 
   void start() {
     LoginRequest request = LoginRequest();
     request.delegate = this;
-    request.success = (data) {
-      print("success");
-    };
-    request.failure = (data) {
-      print("failure");
-    };
     request.start();
   }
 }

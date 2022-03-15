@@ -13,12 +13,12 @@ class LoginRequest extends MCBaseRequest {
 
   @override
   String requestUrl() {
-    return "http://any.clubchopp.com/any-starr/api/campaign/find_all_campaigns";
+    return "https://download-1257933677.cos.ap-shanghai.myqcloud.com/download/t.json";
   }
 
   @override
   MCRequestMethod requestMethod() {
-    return MCRequestMethod.Post;
+    return MCRequestMethod.Get;
   }
 
   @override
@@ -28,11 +28,11 @@ class LoginRequest extends MCBaseRequest {
 
   @override
   requestArgument() {
-    FormData data = FormData.fromMap({
-      "campaignJson":
-          json.encode({"start_row": 0, "page_size": 10, "language": "English"})
-    });
-    return data;
+    // FormData data = FormData.fromMap({
+    //   "campaignJson":
+    //       json.encode({"start_row": 0, "page_size": 10, "language": "English"})
+    // });
+    // return data;
   }
 // @override
 // mock() {

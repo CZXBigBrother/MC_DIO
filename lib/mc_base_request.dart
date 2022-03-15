@@ -1,10 +1,9 @@
 import 'mc_dio.dart';
 
+abstract class MCRequestDelegate<T> {
+  void requestFinished(T request);
 
-abstract class MCRequestDelegate {
-  void requestFinished(MCBaseRequest request);
-
-  void requestFailed(MCBaseRequest request);
+  void requestFailed(T request);
 }
 
 ///所有支持的请求
@@ -20,10 +19,12 @@ enum MCRequestMethod {
 
 typedef MCRequestCallback = void Function(MCRequestData data);
 
-class MCBaseRequest {
+abstract class MCBaseRequest<T> {
   MCRequestDelegate? delegate;
 
-  late MCRequestData data;
+  // late MCRequestData data;
+  Response? response;
+  DioError? dioError;
 
   Dio dio = new Dio();
 
@@ -50,8 +51,8 @@ class MCBaseRequest {
     _requestAccessories.add(accessory);
   }
 
-  void startWithCompletionBlockWithSuccess(MCRequestCallback success,
-      MCRequestCallback failure) async {
+  void startWithCompletionBlockWithSuccess(
+      MCRequestCallback success, MCRequestCallback failure) async {
     this.success = success;
     this.failure = failure;
     this.start();
@@ -72,9 +73,10 @@ class MCBaseRequest {
           .add(MCRequestAccessoryInterceptors(accessory: _requestAccessories));
     }
     if (this.isLog() == true) {
-      dio.interceptors
-          .add(LogInterceptor(responseBody: true, requestBody: true,)); //开启请求日志
-
+      dio.interceptors.add(LogInterceptor(
+        responseBody: true,
+        requestBody: true,
+      )); //开启请求日志
     }
     String? path = "";
     if (this.requestUrl()!.startsWith("http") ||
@@ -84,17 +86,17 @@ class MCBaseRequest {
       path = "${this.baseUrl()}${this.requestUrl()}";
     }
     // Map param = this.requestArgument();
-    Response? res;
+    // Response? res;
 
     dynamic mock = await this.mock();
     if (mock != null) {
-      this.data = MCRequestData(
+      MCRequestData data = MCRequestData(
           requestObject: this,
           response: Response(
               data: mock, requestOptions: RequestOptions(path: "mock")));
       this.requestCompleteFilter();
       if (success != null) {
-        success!(this.data);
+        success!(data);
       }
       if (this.delegate != null) {
         this.delegate!.requestFinished(this);
@@ -104,68 +106,73 @@ class MCBaseRequest {
 
     try {
       if (this.requestMethod() == MCRequestMethod.Get) {
-        res = await dio.get(path!,
+        response = await dio.get(path!,
             queryParameters: this.requestArgument(),
             cancelToken: this._token,
             onReceiveProgress: this.onReceiveProgress);
       } else if (this.requestMethod() == MCRequestMethod.Post) {
-        res = await dio.post(path!,
+        response = await dio.post(path!,
             data: this.requestArgument(),
             cancelToken: this._token,
             onSendProgress: this.onSendProgress,
             onReceiveProgress: this.onReceiveProgress);
       } else if (this.requestMethod() == MCRequestMethod.Head) {
-        res = await dio.head(path!,
+        response = await dio.head(path!,
             queryParameters: this.requestArgument(), cancelToken: this._token);
       } else if (this.requestMethod() == MCRequestMethod.Put) {
-        res = await dio.put(path!,
+        response = await dio.put(path!,
             queryParameters: this.requestArgument(),
             cancelToken: this._token,
             onSendProgress: this.onSendProgress,
             onReceiveProgress: this.onReceiveProgress);
       } else if (this.requestMethod() == MCRequestMethod.Delete) {
-        res = await dio.delete(path!,
+        response = await dio.delete(path!,
             queryParameters: this.requestArgument(), cancelToken: this._token);
       } else if (this.requestMethod() == MCRequestMethod.Patch) {
-        res = await dio.patch(path!,
+        response = await dio.patch(path!,
             queryParameters: this.requestArgument(),
             cancelToken: this._token,
             onSendProgress: this.onSendProgress,
             onReceiveProgress: this.onReceiveProgress);
       } else if (this.requestMethod() == MCRequestMethod.Download) {
-        res = await dio.download(path!, this.savePath(),
+        response = await dio.download(path!, this.savePath(),
             queryParameters: this.requestArgument(),
             cancelToken: this._token,
             onReceiveProgress: this.onReceiveProgress);
       }
     } on DioError catch (e) {
-      this.data = MCRequestData(requestObject: this, error: e);
+      dioError = e;
+      MCRequestData data = MCRequestData(requestObject: this, error: e);
       this.requestCompleteFilter();
       if (this.failure != null) {
-        this.failure!(this.data);
+        this.failure!(data);
+        clearCompletionBlock();
       }
       if (this.delegate != null) {
         this.delegate!.requestFailed(this);
       }
       return;
     }
-    if (res == null) {
-      this.data = MCRequestData(
-          requestObject: this,
-          error: DioError(requestOptions: RequestOptions(path: "res_null")));
+    if (response == null) {
+      DioError e = DioError(requestOptions: RequestOptions(path: "res_null"));
+      dioError = e;
+      MCRequestData data = MCRequestData(requestObject: this, error: e);
       this.requestCompleteFilter();
       if (this.failure != null) {
-        this.failure!(this.data);
+        this.failure!(data);
+        clearCompletionBlock();
       }
       if (this.delegate != null) {
         this.delegate!.requestFailed(this);
       }
       return;
     } else {
-      this.data = MCRequestData(requestObject: this, response: res);
+      MCRequestData data =
+          MCRequestData(requestObject: this, response: response);
       this.requestCompleteFilter();
       if (success != null) {
-        success!(this.data);
+        success!(data);
+        clearCompletionBlock();
       }
       if (this.delegate != null) {
         this.delegate!.requestFinished(this);
@@ -265,17 +272,17 @@ class MCBaseRequest {
   /// 如果添加cookie dio.interceptors.add(CookieManager(cookieJar));
   customInterceptorAdd() {}
 
-/// cookie_jar: ^1.0.1
-/// import 'package:cookie_jar/cookie_jar.dart';
-/// cookie管理
-/// 内存缓存
-/// return CookieManager(CookieJar());
-/// 本地缓存
-/// return CookieManager(PersistCookieJar());
-/// 缓存
-/// Directory appDocDir = await getApplicationDocumentsDirectory();
-/// String appDocPath = appDocDir.path;
-/// var cookieJar=PersistCookieJar(dir:appdocPath+"/.cookies/");
+  /// cookie_jar: ^1.0.1
+  /// import 'package:cookie_jar/cookie_jar.dart';
+  /// cookie管理
+  /// 内存缓存
+  /// return CookieManager(CookieJar());
+  /// 本地缓存
+  /// return CookieManager(PersistCookieJar());
+  /// 缓存
+  /// Directory appDocDir = await getApplicationDocumentsDirectory();
+  /// String appDocPath = appDocDir.path;
+  /// var cookieJar=PersistCookieJar(dir:appdocPath+"/.cookies/");
 // CookieManager cookieJar() {
 //   return null;
 // }
