@@ -3,11 +3,16 @@ import 'package:mc_dio/mc_dio.dart';
 import 'request_example.dart';
 
 void main() async {
+  ///配置base,也可以直接传回自动判断是不是http 或者 https
   MCNetworkConfig().baseUrl = 'https://xrurl.cn/';
+
+  ///统一打开日志
   MCNetworkConfig().isLog = true;
-  // sendRequestDemo();
-  var xxx = TestWidget();
-  xxx.start();
+
+  ///正常请求
+  sendRequestDemo();
+  var delegateRequest = TestWidget();
+  delegateRequest.start();
 }
 
 //网络请求 调用 LoginRequest

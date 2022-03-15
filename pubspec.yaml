@@ -1,6 +1,6 @@
 name: mc_dio
 description: Command of DIO request,Encapsulating each request as an object, the request supports both centralized and separated API usage
-version: 0.3.1
+version: 0.3.2
 # author: marcochen
 homepage: https://github.com/CZXBigBrother/MC_DIO
 
