@@ -21,6 +21,7 @@ typedef MCRequestCallback = void Function(MCRequestData data);
 
 abstract class MCBaseRequest<T> {
   MCRequestDelegate? delegate;
+  bool _isRunning = false;
 
   // late MCRequestData data;
   Response? response;
@@ -51,8 +52,8 @@ abstract class MCBaseRequest<T> {
     _requestAccessories.add(accessory);
   }
 
-  void startWithCompletionBlockWithSuccess(
-      MCRequestCallback success, MCRequestCallback failure) async {
+  void startWithCompletionBlockWithSuccess(MCRequestCallback success,
+      MCRequestCallback failure) async {
     this.success = success;
     this.failure = failure;
     this.start();
@@ -60,6 +61,7 @@ abstract class MCBaseRequest<T> {
   }
 
   Future? start() async {
+    _isRunning = true;
     dio.options.connectTimeout = this.connectTimeout();
     dio.options.receiveTimeout = this.receiveTimeout();
     dio.options.sendTimeout = this.sendTimeout();
@@ -141,6 +143,7 @@ abstract class MCBaseRequest<T> {
             onReceiveProgress: this.onReceiveProgress);
       }
     } on DioError catch (e) {
+      _isRunning = false;
       dioError = e;
       MCRequestData data = MCRequestData(requestObject: this, error: e);
       this.requestCompleteFilter();
@@ -154,6 +157,7 @@ abstract class MCBaseRequest<T> {
       return;
     }
     if (response == null) {
+      _isRunning = false;
       DioError e = DioError(requestOptions: RequestOptions(path: "res_null"));
       dioError = e;
       MCRequestData data = MCRequestData(requestObject: this, error: e);
@@ -167,8 +171,9 @@ abstract class MCBaseRequest<T> {
       }
       return;
     } else {
+      _isRunning = false;
       MCRequestData data =
-          MCRequestData(requestObject: this, response: response);
+      MCRequestData(requestObject: this, response: response);
       this.requestCompleteFilter();
       if (success != null) {
         success!(data);
@@ -252,6 +257,9 @@ abstract class MCBaseRequest<T> {
     return Headers.formUrlEncodedContentType;
   }
 
+  ///是否请求中
+  bool get isRunning => _isRunning;
+
   /// [responseType] 表示期望以那种格式(方式)接受响应数据。
   /// 目前 [ResponseType] 接受三种类型 `JSON`, `STREAM`, `PLAIN`.
   ///
@@ -272,17 +280,17 @@ abstract class MCBaseRequest<T> {
   /// 如果添加cookie dio.interceptors.add(CookieManager(cookieJar));
   customInterceptorAdd() {}
 
-  /// cookie_jar: ^1.0.1
-  /// import 'package:cookie_jar/cookie_jar.dart';
-  /// cookie管理
-  /// 内存缓存
-  /// return CookieManager(CookieJar());
-  /// 本地缓存
-  /// return CookieManager(PersistCookieJar());
-  /// 缓存
-  /// Directory appDocDir = await getApplicationDocumentsDirectory();
-  /// String appDocPath = appDocDir.path;
-  /// var cookieJar=PersistCookieJar(dir:appdocPath+"/.cookies/");
+/// cookie_jar: ^1.0.1
+/// import 'package:cookie_jar/cookie_jar.dart';
+/// cookie管理
+/// 内存缓存
+/// return CookieManager(CookieJar());
+/// 本地缓存
+/// return CookieManager(PersistCookieJar());
+/// 缓存
+/// Directory appDocDir = await getApplicationDocumentsDirectory();
+/// String appDocPath = appDocDir.path;
+/// var cookieJar=PersistCookieJar(dir:appdocPath+"/.cookies/");
 // CookieManager cookieJar() {
 //   return null;
 // }
